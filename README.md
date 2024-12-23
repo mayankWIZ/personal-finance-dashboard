@@ -1,2 +1,2 @@
-# personal-finance-dashboard
+# Personal Finance Dashboard
 Personal Finance Dashboard
