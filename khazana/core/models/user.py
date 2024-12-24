@@ -14,15 +14,4 @@ class UserDB(DBBaseModel):
     hashed_password = Column(String)
     scopes = Column(String, default="user")
     firstLogin = Column(Boolean, default=True)
-
-
-class Transaction():
-    __tablename__ = "transactions"
-    id = Column(UUID, primary_key=True)
-    user_id = Column(UUID, ForeignKey("users.id"))
-    description = Column(String)
-    amount = Column(Float)
-    category = Column(String)
-    date = Column(String)
-
-    user = relationship("User", back_populates="transactions")
+    createdBy = Column(UUID, ForeignKey("users.id"), nullable=True, default=None)

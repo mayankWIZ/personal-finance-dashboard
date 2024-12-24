@@ -1,8 +1,7 @@
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from passlib.context import CryptContext
-from sqlalchemy import text
-from uuid import uuid4
 
 from khazana.core.utils.database import engine, DBBaseModel, SessionLocal
 from khazana.core.models import UserDB
@@ -13,6 +12,8 @@ API_PREFIX = "/api"
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    os.environ["JWT_SECRET"] = "secret"
+    os.environ["JWT_ALGORITHM"] = "HS256"
     DBBaseModel.metadata.create_all(bind=engine)
     with SessionLocal() as db:
         user = db.query(UserDB).filter(UserDB.username == "admin").first()

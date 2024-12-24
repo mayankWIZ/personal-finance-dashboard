@@ -13,9 +13,6 @@ from khazana.core import PASSWORD_PATTERN
 from ..models.user import UserDB
 from .database import get_db
 
-# Secret key and algorithm for JWT
-SECRET_KEY = os.environ["JWT_SECRET"]
-ALGORITHM = os.environ["JWT_ALGORITHM"]
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 oauth2_scheme = OAuth2PasswordBearer(
@@ -31,6 +28,9 @@ oauth2_scheme = OAuth2PasswordBearer(
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """Create access token."""
+    # Secret key and algorithm for JWT
+    SECRET_KEY = os.environ["JWT_SECRET"]
+    ALGORITHM = os.environ["JWT_ALGORITHM"]
     to_encode = data.copy()
     expire = datetime.now(timezone.utc) + (
         expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -57,6 +57,10 @@ def _get_current_user(
     Returns:
         User: The owner of the token.
     """
+    # Secret key and algorithm for JWT
+    SECRET_KEY = os.environ["JWT_SECRET"]
+    ALGORITHM = os.environ["JWT_ALGORITHM"]
+
     credentials_exception = HTTPException(
         status_code=401,
         detail="Could not validate credentials.",

@@ -21,15 +21,18 @@ router = APIRouter(prefix="/users", tags=["Users"])
 
 @router.get("/", description="Get list of users.", response_model=List[UserOut])
 async def get_users(
-    user: UserDB = Security(get_current_user, scopes=["admin"]),
+    user: UserDB = Security(get_current_user, scopes=["admin", "me"]),
     db: Session = Depends(get_db),
 ) -> List[UserOut]:
     """List users."""
+    filters = [
+        UserDB.username.notin_(["admin", user.username])
+    ]
+    if not is_admin(user):
+        filters.append(UserDB.createdBy == user.id)
     return [
         UserOut(**user.__dict__)
-        for user in db.query(UserDB).filter(
-            UserDB.username.notin_(["admin", user.username])
-        )
+        for user in db.query(UserDB).filter(*filters)
     ]
 
 
