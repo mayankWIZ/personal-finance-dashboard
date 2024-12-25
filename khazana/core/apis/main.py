@@ -31,6 +31,7 @@ MODULES = {
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Lifespan handler."""
+    # We will move this to env file in dockerize version
     os.environ["JWT_SECRET"] = "secret"
     os.environ["JWT_ALGORITHM"] = "HS256"
     os.environ["EXCHANGE_RATE_API_KEY"] = "9e9ecae8b8ca62d01fc22f16e4460333"
