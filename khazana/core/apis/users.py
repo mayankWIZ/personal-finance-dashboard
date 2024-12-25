@@ -1,20 +1,16 @@
 """User related Endpoints."""
 
-from fastapi import APIRouter, Depends, Security, HTTPException
-from sqlalchemy.orm import Session
-from khazana.core.utils import (
-    get_current_user,
-    get_password_hash,
-    get_current_user_first_login,
-    verify_password,
-    is_weak_password,
-    is_admin,
-)
-from khazana.core.models import UserDB
-from khazana.core.serializers import UserOut, UserIn, ChangePasswordIn
-from khazana.core.database import get_db
 from typing import List
 
+from fastapi import APIRouter, Depends, HTTPException, Security
+from sqlalchemy.orm import Session
+
+from khazana.core.database import get_db
+from khazana.core.models import UserDB
+from khazana.core.serializers import ChangePasswordIn, UserIn, UserOut
+from khazana.core.utils import (get_current_user, get_current_user_first_login,
+                                get_password_hash, is_admin, is_weak_password,
+                                verify_password)
 
 router = APIRouter(prefix="/users", tags=["Users"])
 

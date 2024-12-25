@@ -1,7 +1,8 @@
 """Transaction Dashboard serializers."""
 
-from pydantic import BaseModel
 from typing import Dict
+
+from pydantic import BaseModel
 
 
 class TransactionDashboardOut(BaseModel):

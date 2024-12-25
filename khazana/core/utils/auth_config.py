@@ -1,17 +1,19 @@
-import jwt
 import os
 import re
 from datetime import datetime, timedelta, timezone
 from typing import Optional
+
+import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
+from jwt import PyJWTError
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
-from jwt import PyJWTError
 
 from khazana.core import PASSWORD_PATTERN
-from ..models.users import UserDB
+
 from ..database import get_db
+from ..models.users import UserDB
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

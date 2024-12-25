@@ -1,14 +1,15 @@
 import os
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
-from . import auth
-from khazana.core.database import engine, DBBaseModel, SessionLocal
+from khazana.core.database import DBBaseModel, SessionLocal, engine
 from khazana.core.models import UserDB
-from . import users
+
 from ...transactions import apis as transactions_router
+from . import auth, users
 
 
 class ErrorMessage(BaseModel):

@@ -2,4 +2,4 @@
 """Common Serializers"""
 
 from .auth import OAuth2PasswordRequestForm
-from .users import UserOut, UserIn, ChangePasswordIn
+from .users import ChangePasswordIn, UserIn, UserOut

@@ -1,5 +1,6 @@
-from pydantic import field_validator, BaseModel, Field
 from typing import List, Optional
+
+from pydantic import BaseModel, Field, field_validator
 
 
 class UserOut(BaseModel):

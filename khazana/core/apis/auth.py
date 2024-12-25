@@ -1,13 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+
+from khazana.core.database import get_db
 from khazana.core.models import UserDB
 from khazana.core.serializers import OAuth2PasswordRequestForm
-from khazana.core.utils import (
-    create_access_token,
-    is_weak_password,
-    verify_password
-)
-from khazana.core.database import get_db
+from khazana.core.utils import (create_access_token, is_weak_password,
+                                verify_password)
 
 router = APIRouter()
 
