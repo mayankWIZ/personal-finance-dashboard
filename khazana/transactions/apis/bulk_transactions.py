@@ -78,15 +78,14 @@ def create_bulk_transactions(
     transactions["userId"] = transaction_user.id
     transactions["createdBy"] = user.id
 
-    transactions["category"].fillna("Uncategorized", inplace=True)
-    transactions["category"].replace(
-        {"": "Uncategorized", None: "Uncategorized"}, inplace=True
+    transactions["category"] = transactions["category"].fillna("Uncategorized")
+    transactions["category"] = transactions["category"].replace(
+        {"": "Uncategorized", None: "Uncategorized"}
     )
 
     # Check is transactionDate is having na/none values
     if (
         transactions["transactionDate"].isna().any()
-        or transactions["transactionDate"].gt(datetime.now(timezone.utc)).any()
     ):
         raise HTTPException(
             status_code=400,
@@ -95,8 +94,15 @@ def create_bulk_transactions(
 
     # Convert transactionDate to datetime
     transactions["transactionDate"] = pd.to_datetime(
-        transactions["transactionDate"]
+        transactions["transactionDate"], utc=True
     )
+
+    # Validate transactionDate is not in the future
+    if transactions["transactionDate"].max() > datetime.now(timezone.utc):
+        raise HTTPException(
+            status_code=400,
+            detail="Transaction date can not be in the future",
+        )
 
     # Logic to select transactionType based on amount
     transactions["transactionType"] = transactions.apply(
