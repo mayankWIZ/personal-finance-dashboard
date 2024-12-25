@@ -15,3 +15,5 @@ class UserDB(DBBaseModel):
     scopes = Column(String, default="user")
     firstLogin = Column(Boolean, default=True)
     createdBy = Column(UUID, ForeignKey("users.id"), nullable=True, default=None)
+
+    transactions = relationship("TransactionDB", back_populates="user", foreign_keys="TransactionDB.userId")

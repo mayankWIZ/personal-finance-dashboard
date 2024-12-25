@@ -1,5 +1,5 @@
 from pydantic import field_validator, BaseModel, Field
-from typing import List, Optional, Union
+from typing import List, Optional
 
 
 class UserOut(BaseModel):

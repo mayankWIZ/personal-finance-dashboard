@@ -2,13 +2,24 @@ import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from passlib.context import CryptContext
+from pydantic import BaseModel
 
 from khazana.core.utils.database import engine, DBBaseModel, SessionLocal
 from khazana.core.models import UserDB
 from .routers import auth, users
+from ...transactions import apis as transactions_router
+
+
+class ErrorMessage(BaseModel):
+    """Error message model."""
+
+    detail: str
+
 
 API_PREFIX = "/api"
-
+MODULES = {
+    "transactions": transactions_router.routers,
+}
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -37,7 +48,21 @@ app = FastAPI(
     docs_url="/api/docs",
     openapi_url="/api/openapi.json",
 )
+common_responses = {
+    "400": {"model": ErrorMessage},
+    "401": {"model": ErrorMessage},
+    "403": {"model": ErrorMessage},
+    "405": {"model": ErrorMessage},
+    "429": {"model": ErrorMessage},
+    "500": {"model": ErrorMessage},
+}
 
+app.include_router(auth.router, responses=common_responses, prefix=API_PREFIX)
+app.include_router(users.router, responses=common_responses, prefix=API_PREFIX)
 
-app.include_router(auth.router, prefix=API_PREFIX)
-app.include_router(users.router, prefix=API_PREFIX)
+# loading integration specific routers
+for prefix, routers in MODULES.items():
+    for router in routers:
+        app.include_router(
+            router, responses=common_responses, prefix=f"{API_PREFIX}/{prefix}"
+        )

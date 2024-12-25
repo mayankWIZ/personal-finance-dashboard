@@ -1,3 +1,3 @@
 """Common models."""
 
-from .user import UserDB
+from .users import UserDB

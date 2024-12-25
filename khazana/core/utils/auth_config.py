@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from jwt import PyJWTError
 
 from khazana.core import PASSWORD_PATTERN
-from ..models.user import UserDB
+from ..models.users import UserDB
 from .database import get_db
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30

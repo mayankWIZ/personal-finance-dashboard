@@ -19,9 +19,9 @@ from typing import List
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-@router.get("/", description="Get list of users.", response_model=List[UserOut])
+@router.get("", description="Get list of users.", response_model=List[UserOut])
 async def get_users(
-    user: UserDB = Security(get_current_user, scopes=["admin", "me"]),
+    user: UserDB = Security(get_current_user, scopes=["me"]),
     db: Session = Depends(get_db),
 ) -> List[UserOut]:
     """List users."""
@@ -37,13 +37,13 @@ async def get_users(
 
 
 @router.post(
-    "/",
+    "",
     description="Create new user.",
     response_model=UserOut,
 )
 async def post_user(
     user: UserIn,
-    loggedin_user: UserDB = Security(get_current_user, scopes=[]),
+    loggedin_user: UserDB = Security(get_current_user, scopes=["me"]),
     db: Session = Depends(get_db),
 ) -> UserOut:
     """Create new user."""
