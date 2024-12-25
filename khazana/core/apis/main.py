@@ -1,3 +1,5 @@
+"""Main API module."""
+
 import os
 from contextlib import asynccontextmanager
 
@@ -23,8 +25,10 @@ MODULES = {
     "transactions": transactions_router.routers,
 }
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    """Lifespan handler."""
     os.environ["JWT_SECRET"] = "secret"
     os.environ["JWT_ALGORITHM"] = "HS256"
     DBBaseModel.metadata.create_all(bind=engine)

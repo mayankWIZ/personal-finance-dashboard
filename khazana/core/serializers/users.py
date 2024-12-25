@@ -1,3 +1,5 @@
+"""User serializers."""
+
 from typing import List, Optional
 
 from pydantic import BaseModel, Field, field_validator
@@ -13,6 +15,7 @@ class UserOut(BaseModel):
     @field_validator("scopes", mode="before")
     @classmethod
     def scopes_validator(cls, vals: str):
+        """Validate scopes."""
         return [val.strip() for val in vals.split(",")]
 
 
@@ -38,5 +41,7 @@ class ChangePasswordIn(BaseModel):
         if len(v) < 8:
             raise ValueError("Password length must be atleast 8 characters.")
         if len(v) > 72:
-            raise ValueError("Password length must be less than 72 characters.")
+            raise ValueError(
+                "Password length must be less than 72 characters."
+            )
         return v

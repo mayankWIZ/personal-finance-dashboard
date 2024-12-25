@@ -1,3 +1,4 @@
+# flake8: noqa
 """Khazana core package."""
 
 PASSWORD_PATTERN = (

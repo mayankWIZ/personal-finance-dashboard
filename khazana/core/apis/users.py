@@ -74,7 +74,6 @@ async def change_password(
     db: Session = Depends(get_db),
 ) -> UserOut:
     """Change password on first login."""
-
     if not verify_password(password_change.oldPassword, user.hashed_password):
         raise HTTPException(400, "Incorrect password.")
     if is_weak_password(password_change.newPassword):
