@@ -78,11 +78,15 @@ def _get_current_user(
         for scope in security_scopes.scopes:
             if scope not in scopes:
                 raise HTTPException(403, "Not enough permissions.")
-        user: UserDB = db.query(UserDB).filter(UserDB.username == username).first()
+        user: UserDB = (
+            db.query(UserDB).filter(UserDB.username == username).first()
+        )
         if not user:
             raise HTTPException(401, "Could not authenticate the user.")
         if user.firstLogin and not allow_on_first_login:
-            raise HTTPException(401, "Change the password before using this endpoint.")
+            raise HTTPException(
+                401, "Change the password before using this endpoint."
+            )
         return user
     except PyJWTError:
         raise credentials_exception
@@ -93,7 +97,10 @@ async def get_current_user(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db),
 ) -> UserDB:
-    return _get_current_user(security_scopes, token, db, allow_on_first_login=False)
+    """Get and validate the current user."""
+    return _get_current_user(
+        security_scopes, token, db, allow_on_first_login=False
+    )
 
 
 async def get_current_user_first_login(
@@ -101,7 +108,10 @@ async def get_current_user_first_login(
     token: str = Depends(oauth2_scheme),
     db: Session = Depends(get_db),
 ) -> UserDB:
-    return _get_current_user(security_scopes, token, db, allow_on_first_login=True)
+    """Get and validate the current user and allow on first login."""
+    return _get_current_user(
+        security_scopes, token, db, allow_on_first_login=True
+    )
 
 
 def is_weak_password(password):
@@ -119,14 +129,17 @@ def is_weak_password(password):
 
 
 def get_password_hash(password: str):
+    """Hash the password using bcrypt algorithm."""
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password, hashed_password):
+    """Check if passwords are matching."""
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def is_admin(user: UserDB) -> bool:
+    """Check if the user is admin or not."""
     return "admin" in user.scopes.split(",")

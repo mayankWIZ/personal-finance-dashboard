@@ -9,6 +9,8 @@ from khazana.core.database import DBBaseModel
 
 
 class ExchangeRateSymbolDB(DBBaseModel):
+    """Exchange rate symbol database model."""
+
     __tablename__ = "exchange_rate_symbols"
 
     symbol = Column(String, nullable=False, primary_key=True, index=True)
@@ -17,6 +19,8 @@ class ExchangeRateSymbolDB(DBBaseModel):
 
 
 class ExchangeRatesDB(DBBaseModel):
+    """Exchange rates database model."""
+
     __tablename__ = "exchange_rates"
 
     id = Column(

@@ -5,8 +5,14 @@ import tempfile
 from datetime import datetime, timezone
 
 import pandas as pd
-from fastapi import (APIRouter, Depends, File, HTTPException, Security,
-                     UploadFile)
+from fastapi import (
+    APIRouter,
+    Depends,
+    File,
+    HTTPException,
+    Security,
+    UploadFile,
+)
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -15,7 +21,7 @@ from khazana.core.models import UserDB
 from khazana.core.utils import get_current_user
 
 from ..models import TransactionDB
-from ..serializers import TransactionIn, TransactionOut
+from ..serializers import TransactionOut
 from ..utils import TransactionType
 
 router = APIRouter(prefix="/bulk", tags=["Bulk Transactions"])
@@ -27,9 +33,15 @@ def _select_transaction_type(record):
     else:
         transaction_type = record["transactionType"].lower()
     transaction_type = TransactionType(transaction_type).value
-    if record["amount"] < 0 and transaction_type != TransactionType.investment.value:
+    if (
+        record["amount"] < 0
+        and transaction_type != TransactionType.investment.value
+    ):
         transaction_type = TransactionType.expense.value
-    elif record["amount"] > 0 and transaction_type != TransactionType.investment.value:
+    elif (
+        record["amount"] > 0
+        and transaction_type != TransactionType.investment.value
+    ):
         transaction_type = TransactionType.income.value
     return transaction_type
 
@@ -41,12 +53,18 @@ def _select_transaction_type(record):
 )
 def create_bulk_transactions(
     username: str,
-    transaction_file: UploadFile = File(..., description="CSV file of transactions"),
+    transaction_file: UploadFile = File(
+        ..., description="CSV file of transactions"
+    ),
     db: Session = Depends(get_db),
-    user: UserDB = Security(get_current_user, scopes=["admin", "transaction_write"]),
+    user: UserDB = Security(
+        get_current_user, scopes=["admin", "transaction_write"]
+    ),
 ):
     """Create bulk transactions."""
-    transaction_user = db.query(UserDB).filter(UserDB.username == username).first()
+    transaction_user = (
+        db.query(UserDB).filter(UserDB.username == username).first()
+    )
     if not transaction_user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -66,11 +84,19 @@ def create_bulk_transactions(
     )
 
     # Check is transactionDate is having na/none values
-    if transactions["transactionDate"].isna().any():
-        raise HTTPException(status_code=400, detail="Transaction date can not be null")
+    if (
+        transactions["transactionDate"].isna().any()
+        or transactions["transactionDate"].gt(datetime.now(timezone.utc)).any()
+    ):
+        raise HTTPException(
+            status_code=400,
+            detail="Transaction date can not be null or in the future",
+        )
 
     # Convert transactionDate to datetime
-    transactions["transactionDate"] = pd.to_datetime(transactions["transactionDate"])
+    transactions["transactionDate"] = pd.to_datetime(
+        transactions["transactionDate"]
+    )
 
     # Logic to select transactionType based on amount
     transactions["transactionType"] = transactions.apply(
@@ -90,17 +116,25 @@ def create_bulk_transactions(
 def export_transactions(
     username: str,
     db: Session = Depends(get_db),
-    user: UserDB = Security(get_current_user, scopes=["admin", "transaction_read"]),
+    user: UserDB = Security(
+        get_current_user, scopes=["admin", "transaction_read"]
+    ),
 ):
     """Export user transactions."""
-    requested_user = db.query(UserDB).filter(UserDB.username == username).first()
+    requested_user = (
+        db.query(UserDB).filter(UserDB.username == username).first()
+    )
     if not requested_user:
         raise HTTPException(status_code=404, detail="User not found")
     transactions = (
-        db.query(TransactionDB).filter(TransactionDB.userId == requested_user.id).all()
+        db.query(TransactionDB)
+        .filter(TransactionDB.userId == requested_user.id)
+        .all()
     )
     if not transactions:
-        raise HTTPException(status_code=400, detail="No transactions to export")
+        raise HTTPException(
+            status_code=400, detail="No transactions to export"
+        )
     with tempfile.NamedTemporaryFile() as temp_file:
         pd.DataFrame(
             [
@@ -108,12 +142,15 @@ def export_transactions(
                 for transaction in transactions
             ]
         ).to_csv(temp_file.name, index=False)
+        dnow = datetime.now(timezone.utc).strftime("%Y%m%d%H%M%S")
         return StreamingResponse(
             iter([temp_file.read()]),
             media_type="text/csv",
             headers={
                 "Content-Disposition": (
-                    f"attachment; filename={username}_transactions_"
-                    f"{datetime.now(timezone.utc).strftime('%Y-%m-%d_%H-%M-%S')}.csv")
+                    f"attachment; filename={username}_"
+                    f"transactions_"
+                    f"{dnow}.csv"
+                )
             },
         )

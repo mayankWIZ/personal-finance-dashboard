@@ -1,3 +1,5 @@
+"""Transaction serializers."""
+
 from datetime import datetime, timezone
 from typing import Optional
 from uuid import UUID
@@ -16,7 +18,8 @@ class TransactionIn(BaseModel):
         description=(
             "If transactionType is not investment it will be "
             "considered as either expense or income based on "
-            "the amount."),
+            "the amount."
+        ),
     )
     category: str = Field(...)
     transactionDate: datetime = Field(datetime.now(timezone.utc))
@@ -25,6 +28,7 @@ class TransactionIn(BaseModel):
     @field_validator("transactionDate")
     @classmethod
     def validate_transaction_date(cls, v: datetime):
+        """Validate transaction date."""
         if v.tzinfo is None:
             v = v.replace(tzinfo=timezone.utc)
         if v > datetime.now(timezone.utc):
@@ -40,6 +44,7 @@ class TransactionOut(TransactionIn):
     @field_validator("transactionDate")
     @classmethod
     def validate_transaction_date(cls, v: datetime):
+        """Override transaction date validation."""
         return v
 
 
@@ -52,7 +57,8 @@ class TransactionUpdate(BaseModel):
         description=(
             "If transactionType is not investment it will be "
             "considered as either expense or income based on "
-            "the amount."),
+            "the amount."
+        ),
     )
     category: Optional[str] = Field(None)
     transactionDate: Optional[datetime] = Field(None)
@@ -61,6 +67,7 @@ class TransactionUpdate(BaseModel):
     @field_validator("transactionDate")
     @classmethod
     def validate_transaction_date(cls, v: datetime):
+        """Validate transaction date."""
         if not v:
             return v
         if v.tzinfo is None:

@@ -25,11 +25,17 @@ router = APIRouter(prefix="/dashboard", tags=["Transaction Dashboard"])
 def get_dashboard_data(
     username: str,
     db: Session = Depends(get_db),
-    user: UserDB = Security(get_current_user, scopes=["admin", "transaction_read"]),
+    user: UserDB = Security(
+        get_current_user, scopes=["admin", "transaction_read"]
+    ),
 ) -> dict:
-    """Get aggregate data for total savings, monthly expenses, and investment growth by user."""
+    """Get aggregate data.
 
-    requested_user = db.query(UserDB).filter(UserDB.username == username).first()
+    For total savings, monthly expenses, and investment growth by user.
+    """
+    requested_user = (
+        db.query(UserDB).filter(UserDB.username == username).first()
+    )
     if not requested_user:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -48,8 +54,16 @@ def get_dashboard_data(
         .all()
     )
     total_savings_month_wise = {}
-    for key, transactions in groupby(transactions, key=lambda x: [str(x.transactionDate.year), str(x.transactionDate.month)]):
-        total_savings_month_wise["-".join(key)] = sum(transaction.amount for transaction in transactions)
+    for key, transactions in groupby(
+        transactions,
+        key=lambda x: [
+            str(x.transactionDate.year),
+            str(x.transactionDate.month),
+        ],
+    ):
+        total_savings_month_wise["-".join(key)] = sum(
+            transaction.amount for transaction in transactions
+        )
 
     expenses = (
         db.query(
@@ -63,8 +77,16 @@ def get_dashboard_data(
         .all()
     )
     monthly_expenses = {}
-    for key, expenses in groupby(expenses, key=lambda x: [str(x.transactionDate.year), str(x.transactionDate.month)]):
-        monthly_expenses["-".join(key)] = sum(expense.amount for expense in expenses)
+    for key, expenses in groupby(
+        expenses,
+        key=lambda x: [
+            str(x.transactionDate.year),
+            str(x.transactionDate.month),
+        ],
+    ):
+        monthly_expenses["-".join(key)] = sum(
+            expense.amount for expense in expenses
+        )
     investment_growth = (
         db.query(TransactionDB.category, sa_func.sum(TransactionDB.amount))
         .filter(

@@ -8,9 +8,14 @@ from sqlalchemy.orm import Session
 from khazana.core.database import get_db
 from khazana.core.models import UserDB
 from khazana.core.serializers import ChangePasswordIn, UserIn, UserOut
-from khazana.core.utils import (get_current_user, get_current_user_first_login,
-                                get_password_hash, is_admin, is_weak_password,
-                                verify_password)
+from khazana.core.utils import (
+    get_current_user,
+    get_current_user_first_login,
+    get_password_hash,
+    is_admin,
+    is_weak_password,
+    verify_password,
+)
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
@@ -21,14 +26,11 @@ async def get_users(
     db: Session = Depends(get_db),
 ) -> List[UserOut]:
     """List users."""
-    filters = [
-        UserDB.username.notin_(["admin", user.username])
-    ]
+    filters = [UserDB.username.notin_(["admin", user.username])]
     if not is_admin(user):
         filters.append(UserDB.createdBy == user.id)
     return [
-        UserOut(**user.__dict__)
-        for user in db.query(UserDB).filter(*filters)
+        UserOut(**user.__dict__) for user in db.query(UserDB).filter(*filters)
     ]
 
 
@@ -50,7 +52,7 @@ async def post_user(
             raise HTTPException(
                 403,
                 "You can not provide scopes that you "
-                "don't have. Please contact admin."
+                "don't have. Please contact admin.",
             )
     user = UserDB(
         username=user.username,
@@ -82,8 +84,8 @@ async def change_password(
             "Password is too weak. Password should "
             "include at least 1 uppercase, "
             "1 lowercase, 1 number and "
-            "1 special character."
-         )
+            "1 special character.",
+        )
     user = db.get(UserDB, user.id)
     if user.firstLogin:
         user.firstLogin = False

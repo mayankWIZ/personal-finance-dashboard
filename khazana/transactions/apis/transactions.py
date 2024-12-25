@@ -27,7 +27,9 @@ def list_transactions(
     user: UserDB = Security(get_current_user, scopes=["transaction_read"]),
 ) -> List[TransactionOut]:
     """List transactions."""
-    return db.query(TransactionDB).filter(TransactionDB.userId == user.id).all()
+    return (
+        db.query(TransactionDB).filter(TransactionDB.userId == user.id).all()
+    )
 
 
 @router.get(
@@ -38,13 +40,21 @@ def list_transactions(
 def list_user_transactions(
     username: str,
     db: Session = Depends(get_db),
-    user: UserDB = Security(get_current_user, scopes=["admin", "transaction_read"]),
+    user: UserDB = Security(
+        get_current_user, scopes=["admin", "transaction_read"]
+    ),
 ) -> List[TransactionOut]:
     """List transactions by user."""
-    requested_user = db.query(UserDB).filter(UserDB.username == username).first()
+    requested_user = (
+        db.query(UserDB).filter(UserDB.username == username).first()
+    )
     if not requested_user:
         raise HTTPException(status_code=404, detail="User not found")
-    return db.query(TransactionDB).filter(TransactionDB.userId == requested_user.id).all()
+    return (
+        db.query(TransactionDB)
+        .filter(TransactionDB.userId == requested_user.id)
+        .all()
+    )
 
 
 @router.post(
@@ -59,9 +69,15 @@ def create_transaction(
 ) -> TransactionOut:
     """Create a user transaction."""
     transaction_type = transaction.transactionType
-    if transaction.amount < 0 and transaction_type != TransactionType.investment:
+    if (
+        transaction.amount < 0
+        and transaction_type != TransactionType.investment
+    ):
         transaction_type = TransactionType.expense
-    elif transaction.amount > 0 and transaction_type != TransactionType.investment:
+    elif (
+        transaction.amount > 0
+        and transaction_type != TransactionType.investment
+    ):
         transaction_type = TransactionType.income
     transaction = TransactionDB(
         **{
@@ -88,16 +104,23 @@ def update_transaction(
     db: Session = Depends(get_db),
     user: UserDB = Security(get_current_user, scopes=["transaction_write"]),
 ):
+    """Update a transaction."""
     transaction = (
         db.query(TransactionDB)
-        .filter(TransactionDB.id == transaction_id, TransactionDB.userId == user.id)
+        .filter(
+            TransactionDB.id == transaction_id, TransactionDB.userId == user.id
+        )
         .first()
     )
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
-    updates = transaction_update.model_dump(exclude_none=True, exclude_unset=True)
+    updates = transaction_update.model_dump(
+        exclude_none=True, exclude_unset=True
+    )
     if not updates:
-        raise HTTPException(status_code=400, detail="No fields to update provided")
+        raise HTTPException(
+            status_code=400, detail="No fields to update provided"
+        )
     for key, value in updates.items():
         setattr(transaction, key, value)
     db.commit()
@@ -114,9 +137,12 @@ def delete_transaction(
     db: Session = Depends(get_db),
     user: UserDB = Security(get_current_user, scopes=["transaction_write"]),
 ):
+    """Delete a transaction."""
     transaction = (
         db.query(TransactionDB)
-        .filter(TransactionDB.id == transaction_id, TransactionDB.userId == user.id)
+        .filter(
+            TransactionDB.id == transaction_id, TransactionDB.userId == user.id
+        )
         .first()
     )
     if not transaction:

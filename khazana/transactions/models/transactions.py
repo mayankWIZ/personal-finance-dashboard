@@ -1,3 +1,5 @@
+"""Transactions related database models."""
+
 from datetime import datetime, timezone
 from uuid import uuid4
 
@@ -10,6 +12,8 @@ from ..utils import TransactionType
 
 
 class TransactionDB(DBBaseModel):
+    """Transaction database model."""
+
     __tablename__ = "transactions"
     id = Column(
         UUID(as_uuid=True), primary_key=True, index=True, default=uuid4
@@ -21,7 +25,9 @@ class TransactionDB(DBBaseModel):
     transactionDate = Column(
         DateTime, default=datetime.now(timezone.utc), index=True
     )
-    createdBy = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
+    createdBy = Column(
+        UUID(as_uuid=True), ForeignKey("users.id"), nullable=True
+    )
     transactionType = Column(
         String,
         nullable=False,
@@ -32,5 +38,5 @@ class TransactionDB(DBBaseModel):
     user = relationship(
         "UserDB",
         back_populates="transactions",
-        foreign_keys="TransactionDB.userId"
+        foreign_keys="TransactionDB.userId",
     )

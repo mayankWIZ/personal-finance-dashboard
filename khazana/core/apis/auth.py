@@ -6,8 +6,11 @@ from sqlalchemy.orm import Session
 from khazana.core.database import get_db
 from khazana.core.models import UserDB
 from khazana.core.serializers import OAuth2PasswordRequestForm
-from khazana.core.utils import (create_access_token, is_weak_password,
-                                verify_password)
+from khazana.core.utils import (
+    create_access_token,
+    is_weak_password,
+    verify_password,
+)
 
 router = APIRouter()
 
@@ -24,9 +27,11 @@ def get_token(
     """Get authentication token."""
     password_policy_violation = False
     if form_data.username and form_data.password:
-        user: UserDB = db.query(UserDB).filter(
-            UserDB.username == form_data.username
-        ).first()
+        user: UserDB = (
+            db.query(UserDB)
+            .filter(UserDB.username == form_data.username)
+            .first()
+        )
         if not user:
             raise HTTPException(401, "Incorrect username or password.")
 

@@ -12,7 +12,11 @@ from khazana.core.database import get_db
 
 from ..models import ExchangeRatesDB, ExchangeRateSymbolDB
 from ..serializers import ExchangeRatesOut, ExchangeRateSymbolOut
-from ..utils import fetch_exchange_rates, fetch_exchange_rate_symbols, EXCHANGE_RATE_EXPIRE_MINUTES
+from ..utils import (
+    fetch_exchange_rates,
+    fetch_exchange_rate_symbols,
+    EXCHANGE_RATE_EXPIRE_MINUTES,
+)
 
 router = APIRouter(tags=["Exchange Rates"])
 
@@ -28,17 +32,29 @@ def list_exchange_rates(
 ) -> ExchangeRatesOut:
     """List transactions."""
     are_rates_expired = False
-    rate = db.query(ExchangeRatesDB).order_by(ExchangeRatesDB.last_updated.desc()).first()
+    rate = (
+        db.query(ExchangeRatesDB)
+        .order_by(ExchangeRatesDB.last_updated.desc())
+        .first()
+    )
     if not rate:
         are_rates_expired = True
-    elif rate.last_updated < (datetime.now(timezone.utc) - timedelta(minutes=EXCHANGE_RATE_EXPIRE_MINUTES)).replace(tzinfo=None):
+    elif rate.last_updated < (
+        datetime.now(timezone.utc)
+        - timedelta(minutes=EXCHANGE_RATE_EXPIRE_MINUTES)
+    ).replace(tzinfo=None):
         are_rates_expired = True
     if are_rates_expired:
         exchange_rate_symbols = fetch_exchange_rate_symbols()
-        existing_symbols = {symbol.symbol: symbol for symbol in db.query(ExchangeRateSymbolDB).all()}
+        existing_symbols = {
+            symbol.symbol: symbol
+            for symbol in db.query(ExchangeRateSymbolDB).all()
+        }
         for symbol, full_name in exchange_rate_symbols["symbols"].items():
             if symbol in existing_symbols:
-                existing_symbols[symbol].last_updated = datetime.now(timezone.utc)
+                existing_symbols[symbol].last_updated = datetime.now(
+                    timezone.utc
+                )
                 db.add(existing_symbols[symbol])
             else:
                 db.add(ExchangeRateSymbolDB(symbol=symbol, fullName=full_name))
