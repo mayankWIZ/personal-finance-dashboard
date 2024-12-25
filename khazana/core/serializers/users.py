@@ -1,8 +1,16 @@
 """User serializers."""
-
+from enum import Enum
 from typing import List, Optional
-
 from pydantic import BaseModel, Field, field_validator
+
+
+class Scopes(str, Enum):
+    """Scopes."""
+
+    me = "me"
+    admin = "admin"
+    transaction_read = "transaction_read"
+    transaction_write = "transaction_write"
 
 
 class UserOut(BaseModel):
@@ -24,7 +32,7 @@ class UserIn(BaseModel):
 
     username: str
     password: str
-    scopes: List[str]
+    scopes: List[Scopes]
 
 
 class ChangePasswordIn(BaseModel):
@@ -45,3 +53,10 @@ class ChangePasswordIn(BaseModel):
                 "Password length must be less than 72 characters."
             )
         return v
+
+
+class UserUpdate(BaseModel):
+    """User update serializer."""
+
+    username: str
+    scopes: List[Scopes]

@@ -21,6 +21,7 @@ class UserDB(DBBaseModel):
     createdBy = Column(
         UUID, ForeignKey("users.id"), nullable=True, default=None
     )
+    active = Column(Boolean, default=True)
 
     transactions = relationship(
         "TransactionDB",

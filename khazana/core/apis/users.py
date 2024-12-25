@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from khazana.core.database import get_db
 from khazana.core.models import UserDB
-from khazana.core.serializers import ChangePasswordIn, UserIn, UserOut
+from khazana.core.serializers import ChangePasswordIn, UserIn, UserOut, UserUpdate
 from khazana.core.utils import (
     get_current_user,
     get_current_user_first_login,
@@ -95,3 +95,54 @@ async def change_password(
     db.commit()
     db.refresh(user)
     return UserOut(**user.__dict__)
+
+
+@router.patch(
+    "",
+    description="Update user.",
+    response_model=UserOut,
+)
+async def update_user(
+    user_update: UserUpdate,
+    user: UserDB = Security(get_current_user, scopes=["admin"]),
+    db: Session = Depends(get_db),
+) -> UserOut:
+    """Update user."""
+    if user_update.username == "admin" and "admin" not in user_update.scopes:
+        raise HTTPException(403, "You can not update admin.")
+
+    user_requested = (
+        db.query(UserDB)
+        .filter(UserDB.username == user_update.username)
+        .first()
+    )
+    if not user_requested:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user_requested.scopes == ",".join(user_update.scopes):
+        return UserOut(**user_requested.__dict__)
+    user_requested.scopes = ",".join(user_update.scopes)
+    db.add(user_requested)
+    db.commit()
+    db.refresh(user_requested)
+    return UserOut(**user_requested.__dict__)
+
+
+@router.delete(
+    "",
+    description="Delete user."
+)
+async def delete_user(
+    username: str,
+    user: UserDB = Security(get_current_user, scopes=["admin"]),
+    db: Session = Depends(get_db),
+) -> UserOut:
+    """Delete user."""
+    if username == "admin":
+        raise HTTPException(403, "You can not delete admin.")
+    user = db.query(UserDB).filter(UserDB.username == username).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    user.active = False
+    db.commit()
+    db.refresh(user)
+    return {"success": True}
