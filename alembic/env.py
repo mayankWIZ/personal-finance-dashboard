@@ -5,8 +5,7 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from khazana.core.utils import DBBaseModel
-from khazana.core.database import DATABASE_URL
+from khazana.core.database import DATABASE_URL, DBBaseModel
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
