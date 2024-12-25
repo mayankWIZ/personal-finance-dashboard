@@ -1,6 +1,6 @@
 """Exchange Rate routers."""
-from .transactions import router as transactions_router
+from .exchange_rates import router as exchange_rates_router
 
 routers = [
-    transactions_router
+    exchange_rates_router,
 ]

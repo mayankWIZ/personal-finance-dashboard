@@ -11,6 +11,7 @@ from khazana.core.database import DBBaseModel, SessionLocal, engine
 from khazana.core.models import UserDB
 
 from ...transactions import apis as transactions_router
+from ...exchange_rates import apis as exchange_rates_router
 from . import auth, users
 
 
@@ -23,6 +24,7 @@ class ErrorMessage(BaseModel):
 API_PREFIX = "/api"
 MODULES = {
     "transactions": transactions_router.routers,
+    "exchange-rates": exchange_rates_router.routers,
 }
 
 
@@ -31,6 +33,7 @@ async def lifespan(app: FastAPI):
     """Lifespan handler."""
     os.environ["JWT_SECRET"] = "secret"
     os.environ["JWT_ALGORITHM"] = "HS256"
+    os.environ["EXCHANGE_RATE_API_KEY"] = "9e9ecae8b8ca62d01fc22f16e4460333"
     DBBaseModel.metadata.create_all(bind=engine)
     with SessionLocal() as db:
         user = db.query(UserDB).filter(UserDB.username == "admin").first()

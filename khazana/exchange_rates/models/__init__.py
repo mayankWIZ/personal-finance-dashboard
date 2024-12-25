@@ -1,4 +1,4 @@
 # flake8: noqa
 """Transaction DB Models."""
 
-from .transactions import TransactionDB
+from .exchange_rates import ExchangeRateSymbolDB, ExchangeRatesDB

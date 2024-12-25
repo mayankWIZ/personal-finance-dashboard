@@ -1,4 +1,4 @@
 # flake8: noqa
 """Transaction Serializers."""
 
-from .transactions import TransactionIn, TransactionOut, TransactionUpdate
+from .exchange_rates import ExchangeRatesOut, ExchangeRateSymbolOut
