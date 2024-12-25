@@ -11,7 +11,7 @@ from jwt import PyJWTError
 
 from khazana.core import PASSWORD_PATTERN
 from ..models.users import UserDB
-from .database import get_db
+from ..database import get_db
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 

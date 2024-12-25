@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, Security, HTTPException
 from sqlalchemy.orm import Session
 from khazana.core.utils import (
     get_current_user,
-    get_db,
     get_password_hash,
     get_current_user_first_login,
     verify_password,
@@ -13,6 +12,7 @@ from khazana.core.utils import (
 )
 from khazana.core.models import UserDB
 from khazana.core.serializers import UserOut, UserIn, ChangePasswordIn
+from khazana.core.database import get_db
 from typing import List
 
 

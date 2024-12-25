@@ -1,8 +1,8 @@
 """Provides user related models."""
 
-from sqlalchemy import Column, String, Float, ForeignKey, UUID, Boolean
+from sqlalchemy import Column, String, ForeignKey, UUID, Boolean
 from sqlalchemy.orm import relationship
-from khazana.core.utils import DBBaseModel
+from khazana.core.database import DBBaseModel
 from uuid import uuid4
 
 

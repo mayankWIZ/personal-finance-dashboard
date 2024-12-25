@@ -1,6 +1,6 @@
 from sqlalchemy import Column, UUID, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
-from khazana.core.database import DBBaseModel
+from khazana.core.utils import DBBaseModel
 from uuid import uuid4
 from datetime import datetime, timezone
 from ..utils import TransactionType

@@ -1,7 +1,6 @@
 # flake8: noqa
 """Common utils."""
 
-from .database import get_db, DBBaseModel
 from .auth_config import (
     create_access_token,
     get_current_user,

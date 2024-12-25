@@ -4,10 +4,10 @@ from khazana.core.models import UserDB
 from khazana.core.serializers import OAuth2PasswordRequestForm
 from khazana.core.utils import (
     create_access_token,
-    get_db,
     is_weak_password,
     verify_password
 )
+from khazana.core.database import get_db
 
 router = APIRouter()
 

@@ -5,7 +5,8 @@ from sqlalchemy import or_, func as sa_func
 from sqlalchemy.orm import Session
 from itertools import groupby
 
-from khazana.core.utils import get_db, get_current_user
+from khazana.core.utils import get_current_user
+from khazana.core.database import get_db
 from khazana.core.models import UserDB
 from ..models import TransactionDB
 from ..utils import TransactionType

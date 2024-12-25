@@ -4,9 +4,10 @@ from fastapi import FastAPI
 from passlib.context import CryptContext
 from pydantic import BaseModel
 
-from khazana.core.utils.database import engine, DBBaseModel, SessionLocal
+from . import auth
+from khazana.core.database import engine, DBBaseModel, SessionLocal
 from khazana.core.models import UserDB
-from .routers import auth, users
+from . import users
 from ...transactions import apis as transactions_router
 
 

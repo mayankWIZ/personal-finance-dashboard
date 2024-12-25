@@ -8,7 +8,8 @@ from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from datetime import datetime, timezone
 
-from khazana.core.utils import get_db, get_current_user
+from khazana.core.utils import get_current_user
+from khazana.core.database import get_db
 from khazana.core.models import UserDB
 from ..models import TransactionDB
 from ..serializers import TransactionIn, TransactionOut

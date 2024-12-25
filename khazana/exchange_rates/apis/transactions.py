@@ -5,9 +5,8 @@ from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
 
-from khazana.core.utils import get_current_user
+from khazana.core.utils import get_db, get_current_user
 from khazana.core.models import UserDB
-from khazana.core.database import get_db
 
 from ..models import TransactionDB
 from ..serializers import TransactionIn, TransactionOut, TransactionUpdate
