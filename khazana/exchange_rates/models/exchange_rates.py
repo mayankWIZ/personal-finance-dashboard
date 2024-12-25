@@ -3,7 +3,7 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import JSON, UUID, Column, DateTime, String, ForeignKey
+from sqlalchemy import JSON, UUID, Column, DateTime, ForeignKey, String
 
 from khazana.core.database import DBBaseModel
 

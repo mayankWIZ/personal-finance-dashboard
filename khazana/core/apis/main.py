@@ -10,8 +10,8 @@ from pydantic import BaseModel
 from khazana.core.database import DBBaseModel, SessionLocal, engine
 from khazana.core.models import UserDB
 
-from ...transactions import apis as transactions_router
 from ...exchange_rates import apis as exchange_rates_router
+from ...transactions import apis as transactions_router
 from . import auth, users
 
 

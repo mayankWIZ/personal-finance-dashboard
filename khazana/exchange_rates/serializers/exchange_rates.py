@@ -1,8 +1,9 @@
 """Exchange rates serializers."""
 
-from pydantic import BaseModel
 from datetime import datetime
-from typing import Optional, Dict
+from typing import Dict, Optional
+
+from pydantic import BaseModel
 
 
 class ExchangeRateSymbolOut(BaseModel):

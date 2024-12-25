@@ -1,21 +1,21 @@
 """Transaction related Endpoints."""
 
 from datetime import datetime, timedelta, timezone
-from typing import List, Dict, Union
+from typing import Dict, List, Union
 
 from fastapi import APIRouter, Depends, Security
 from sqlalchemy.orm import Session
 
+from khazana.core.database import get_db
 from khazana.core.models import UserDB
 from khazana.core.utils import get_current_user
-from khazana.core.database import get_db
 
 from ..models import ExchangeRatesDB, ExchangeRateSymbolDB
 from ..serializers import ExchangeRatesOut, ExchangeRateSymbolOut
 from ..utils import (
-    fetch_exchange_rates,
-    fetch_exchange_rate_symbols,
     EXCHANGE_RATE_EXPIRE_MINUTES,
+    fetch_exchange_rate_symbols,
+    fetch_exchange_rates,
 )
 
 router = APIRouter(tags=["Exchange Rates"])

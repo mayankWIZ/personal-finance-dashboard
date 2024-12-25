@@ -84,9 +84,7 @@ def create_bulk_transactions(
     )
 
     # Check is transactionDate is having na/none values
-    if (
-        transactions["transactionDate"].isna().any()
-    ):
+    if transactions["transactionDate"].isna().any():
         raise HTTPException(
             status_code=400,
             detail="Transaction date can not be null or in the future",

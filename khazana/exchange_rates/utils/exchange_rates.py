@@ -1,6 +1,7 @@
 """Fetch latest exchange rates and symbols."""
 
 import os
+
 import requests
 
 from .const import (
