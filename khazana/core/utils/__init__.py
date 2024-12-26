@@ -10,3 +10,4 @@ from .auth_config import (
     is_weak_password,
     verify_password,
 )
+from .const import EMAIL_REGEX

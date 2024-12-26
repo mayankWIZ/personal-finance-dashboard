@@ -67,6 +67,7 @@ def list_exchange_rates(
         )
         db.add(rate)
         db.commit()
+        db.refresh(rate)
     return ExchangeRatesOut(**rate.__dict__)
 
 

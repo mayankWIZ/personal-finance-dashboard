@@ -7,7 +7,13 @@ from sqlalchemy.orm import Session
 
 from khazana.core.database import get_db
 from khazana.core.models import UserDB
-from khazana.core.serializers import ChangePasswordIn, UserIn, UserOut, UserUpdate
+from khazana.core.serializers import (
+    ChangePasswordIn,
+    UserIn,
+    UserOut,
+    UserUpdate,
+    UserSignupIn,
+)
 from khazana.core.utils import (
     get_current_user,
     get_current_user_first_login,
@@ -66,6 +72,28 @@ async def post_user(
     return UserOut(**user.__dict__)
 
 
+@router.post(
+    "/signup",
+    description="Signup as a new user.",
+    response_model=UserOut,
+)
+async def signup_new_user(
+    user: UserSignupIn,
+    db: Session = Depends(get_db),
+) -> UserOut:
+    """Create new user."""
+    user = UserDB(
+        username=user.username,
+        hashed_password=get_password_hash(user.password),
+        scopes=",".join(["me"]),
+        firstLogin=False,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return UserOut(**user.__dict__)
+
+
 @router.patch(
     "/change_password",
     description="Change password on first login.",
@@ -78,14 +106,6 @@ async def change_password(
     """Change password on first login."""
     if not verify_password(password_change.oldPassword, user.hashed_password):
         raise HTTPException(400, "Incorrect password.")
-    if is_weak_password(password_change.newPassword):
-        raise HTTPException(
-            400,
-            "Password is too weak. Password should "
-            "include at least 1 uppercase, "
-            "1 lowercase, 1 number and "
-            "1 special character.",
-        )
     user = db.get(UserDB, user.id)
     if user.firstLogin:
         user.firstLogin = False

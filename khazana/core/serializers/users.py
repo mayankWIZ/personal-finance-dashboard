@@ -1,7 +1,9 @@
 """User serializers."""
+import re
 from enum import Enum
 from typing import List, Optional
 from pydantic import BaseModel, Field, field_validator
+from khazana.core.utils import is_weak_password, EMAIL_REGEX
 
 
 class Scopes(str, Enum):
@@ -35,6 +37,44 @@ class UserIn(BaseModel):
     scopes: List[Scopes]
 
 
+class UserSignupIn(BaseModel):
+    """User Create serializer."""
+
+    username: str
+    password: str
+    email: str
+
+    @field_validator("password")
+    @classmethod
+    def validate_password(cls, v: str):
+        """Validate password."""
+        if len(v) < 8:
+            raise ValueError("Password length must be atleast 8 characters.")
+        if len(v) > 72:
+            raise ValueError(
+                "Password length must be less than 72 characters."
+            )
+        result = is_weak_password(v)
+        if result:
+            raise ValueError(
+                "Password is too weak. Password should "
+                "include at least 1 uppercase, "
+                "1 lowercase, 1 number and "
+                "1 special character."
+            )
+        return v
+
+    @field_validator("email")
+    @classmethod
+    def validate_email(cls, v: str):
+        """Validate email."""
+        if len(v) > 100:
+            raise ValueError("Email length must be less than 100 characters.")
+        if not re.match(EMAIL_REGEX, v):
+            raise ValueError("Invalid email format.")
+        return v
+
+
 class ChangePasswordIn(BaseModel):
     """The incoming account settings model."""
 
@@ -44,13 +84,21 @@ class ChangePasswordIn(BaseModel):
 
     @field_validator("newPassword")
     @classmethod
-    def check_length(cls, v: str, info):
+    def check_length(cls, v: str):
         """Validate password."""
         if len(v) < 8:
             raise ValueError("Password length must be atleast 8 characters.")
         if len(v) > 72:
             raise ValueError(
                 "Password length must be less than 72 characters."
+            )
+        result = is_weak_password(v)
+        if result:
+            raise ValueError(
+                "Password is too weak. Password should "
+                "include at least 1 uppercase, "
+                "1 lowercase, 1 number and "
+                "1 special character."
             )
         return v
 
