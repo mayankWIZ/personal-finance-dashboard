@@ -111,7 +111,7 @@ def get_dashboard_data_by_username(
 def get_dashboard_data(
     db: Session = Depends(get_db),
     user: UserDB = Security(
-        get_current_user, scopes=["admin", "transaction_read"]
+        get_current_user, scopes=["transaction_read"]
     ),
 ) -> dict:
     """Get aggregate data.
