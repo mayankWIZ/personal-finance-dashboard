@@ -19,7 +19,9 @@ class UserOut(BaseModel):
     """User serializer."""
 
     username: str
+    fullName: Optional[str] = Field(None)
     scopes: List[str]
+    emailAddress: Optional[str] = Field(None)
     firstLogin: Optional[bool] = Field(False)
 
     @field_validator("scopes", mode="before")
@@ -32,17 +34,20 @@ class UserOut(BaseModel):
 class UserIn(BaseModel):
     """User Create serializer."""
 
+    fullName: str
     username: str
     password: str
+    emailAddress: str
     scopes: List[Scopes]
 
 
 class UserSignupIn(BaseModel):
     """User Create serializer."""
 
+    fullName: str
     username: str
     password: str
-    email: str
+    emailAddress: str
 
     @field_validator("password")
     @classmethod
@@ -64,7 +69,7 @@ class UserSignupIn(BaseModel):
             )
         return v
 
-    @field_validator("email")
+    @field_validator("emailAddress")
     @classmethod
     def validate_email(cls, v: str):
         """Validate email."""

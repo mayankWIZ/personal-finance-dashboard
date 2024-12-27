@@ -19,7 +19,7 @@ from khazana.core.utils import (
     get_current_user_first_login,
     get_password_hash,
     is_admin,
-    is_weak_password,
+    is_exising_user,
     verify_password,
 )
 
@@ -35,9 +35,7 @@ async def get_users(
     filters = [UserDB.username.notin_(["admin", user.username])]
     if not is_admin(user):
         filters.append(UserDB.createdBy == user.id)
-    return [
-        UserOut(**user.__dict__) for user in db.query(UserDB).filter(*filters)
-    ]
+    return [UserOut(**user.__dict__) for user in db.query(UserDB).filter(*filters)]
 
 
 @router.post(
@@ -51,6 +49,10 @@ async def post_user(
     db: Session = Depends(get_db),
 ) -> UserOut:
     """Create new user."""
+    if is_exising_user(
+        {"username": user.username, "emailAddress": user.emailAddress}, db
+    ):
+        raise HTTPException(400, "User with same username or email already exists.")
     final_scopes = set(user.scopes)
     if not is_admin(loggedin_user):
         user_scopes = set(loggedin_user.scopes.split(","))
@@ -61,6 +63,8 @@ async def post_user(
                 "don't have. Please contact admin.",
             )
     user = UserDB(
+        fullName=user.fullName,
+        emailAddress=user.emailAddress,
         username=user.username,
         hashed_password=get_password_hash(user.password),
         scopes=",".join(user.scopes),
@@ -82,7 +86,13 @@ async def signup_new_user(
     db: Session = Depends(get_db),
 ) -> UserOut:
     """Create new user."""
+    if is_exising_user(
+        {"username": user.username, "emailAddress": user.emailAddress}, db
+    ):
+        raise HTTPException(400, "User with same username or email already exists.")
     user = UserDB(
+        fullName=user.fullName,
+        emailAddress=user.emailAddress,
         username=user.username,
         hashed_password=get_password_hash(user.password),
         scopes=",".join(["me"]),
@@ -132,9 +142,7 @@ async def update_user(
         raise HTTPException(403, "You can not update admin.")
 
     user_requested = (
-        db.query(UserDB)
-        .filter(UserDB.username == user_update.username)
-        .first()
+        db.query(UserDB).filter(UserDB.username == user_update.username).first()
     )
     if not user_requested:
         raise HTTPException(status_code=404, detail="User not found")
@@ -147,10 +155,7 @@ async def update_user(
     return UserOut(**user_requested.__dict__)
 
 
-@router.delete(
-    "",
-    description="Delete user."
-)
+@router.delete("", description="Delete user.")
 async def delete_user(
     username: str,
     user: UserDB = Security(get_current_user, scopes=["admin"]),

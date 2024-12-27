@@ -10,4 +10,5 @@ from .auth_config import (
     is_weak_password,
     verify_password,
 )
+from .users import is_exising_user
 from .const import EMAIL_REGEX

@@ -54,7 +54,10 @@ def get_token(
     return {
         "access_token": token,
         "token_type": "bearer",
-        "scopes": granted_scopes,
-        "firstLogin": user.firstLogin,
         "passwordPolicyViolation": password_policy_violation,
+        "scopes": granted_scopes,
+        "username": user.username,
+        "fullName": user.fullName,
+        "firstLogin": user.firstLogin,
+        "emailAddress": user.emailAddress,
     }

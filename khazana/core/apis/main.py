@@ -44,8 +44,10 @@ async def lifespan(app: FastAPI):
             db.add(
                 UserDB(
                     username="admin",
+                    fullName="Super User",
                     hashed_password=pwd_context.hash("admin"),
                     scopes="admin,me,transaction_read,transaction_write",
+                    firstLogin=True,
                 )
             )
             db.commit()

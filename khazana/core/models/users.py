@@ -14,6 +14,7 @@ class UserDB(DBBaseModel):
     __tablename__ = "users"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     username = Column(String, unique=True, index=True)
+    fullName = Column(String, nullable=True)
     emailAddress = Column(String, unique=True, nullable=True)
     hashed_password = Column(String)
     scopes = Column(String, default="user")
