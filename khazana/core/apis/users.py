@@ -85,6 +85,7 @@ async def post_user(
         hashed_password=get_password_hash(user.password),
         scopes=",".join(user.scopes),
         firstLogin=True,
+        createdBy=loggedin_user.id,
     )
     db.add(user)
     db.commit()
