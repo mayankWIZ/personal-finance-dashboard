@@ -112,4 +112,6 @@ class UserUpdate(BaseModel):
     """User update serializer."""
 
     username: str
+    fullName: Optional[str] = Field(None)
+    emailAddress: Optional[str] = Field(None)
     scopes: List[Scopes]

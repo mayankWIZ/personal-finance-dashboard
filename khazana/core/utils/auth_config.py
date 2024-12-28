@@ -79,14 +79,14 @@ def _get_current_user(
             if scope not in scopes:
                 raise HTTPException(403, "Not enough permissions.")
         user: UserDB = (
-            db.query(UserDB).filter(UserDB.username == username).first()
+            db.query(UserDB)
+            .filter(UserDB.username == username, UserDB.active == True)
+            .first()
         )
         if not user:
             raise HTTPException(401, "Could not authenticate the user.")
         if user.firstLogin and not allow_on_first_login:
-            raise HTTPException(
-                401, "Change the password before using this endpoint."
-            )
+            raise HTTPException(401, "Change the password before using this endpoint.")
         return user
     except PyJWTError:
         raise credentials_exception
@@ -98,9 +98,7 @@ async def get_current_user(
     db: Session = Depends(get_db),
 ) -> UserDB:
     """Get and validate the current user."""
-    return _get_current_user(
-        security_scopes, token, db, allow_on_first_login=False
-    )
+    return _get_current_user(security_scopes, token, db, allow_on_first_login=False)
 
 
 async def get_current_user_first_login(
@@ -109,9 +107,7 @@ async def get_current_user_first_login(
     db: Session = Depends(get_db),
 ) -> UserDB:
     """Get and validate the current user and allow on first login."""
-    return _get_current_user(
-        security_scopes, token, db, allow_on_first_login=True
-    )
+    return _get_current_user(security_scopes, token, db, allow_on_first_login=True)
 
 
 def is_weak_password(password):

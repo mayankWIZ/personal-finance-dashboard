@@ -29,11 +29,13 @@ def get_token(
     if form_data.username and form_data.password:
         user: UserDB = (
             db.query(UserDB)
-            .filter(UserDB.username == form_data.username)
+            .filter(
+                UserDB.username == form_data.username
+            )
             .first()
         )
-        if not user:
-            raise HTTPException(401, "Incorrect username or password.")
+        if not user or not user.active:
+            raise HTTPException(401, "Incorrect username or password or user disabled.")
 
         if not verify_password(form_data.password, user.hashed_password):
             raise HTTPException(401, "Incorrect username or password.")

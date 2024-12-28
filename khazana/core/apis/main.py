@@ -48,6 +48,7 @@ async def lifespan(app: FastAPI):
                     hashed_password=pwd_context.hash("admin"),
                     scopes="admin,me,transaction_read,transaction_write",
                     firstLogin=True,
+                    active=True,
                 )
             )
             db.commit()

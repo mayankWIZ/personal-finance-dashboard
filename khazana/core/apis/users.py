@@ -35,7 +35,23 @@ async def get_users(
     filters = [UserDB.username.notin_(["admin", user.username])]
     if not is_admin(user):
         filters.append(UserDB.createdBy == user.id)
-    return [UserOut(**user.__dict__) for user in db.query(UserDB).filter(*filters)]
+    return [
+        UserOut(**user.__dict__)
+        for user in db.query(UserDB).filter(*filters, UserDB.active == True).all()
+    ]
+
+
+@router.get(
+    "/me",
+    description="Get user by username.",
+    response_model=UserOut,
+)
+async def get_me(
+    user: UserDB = Security(get_current_user, scopes=["me"]),
+    db: Session = Depends(get_db),
+) -> UserOut:
+    """Get user by username."""
+    return UserOut(**user.__dict__)
 
 
 @router.post(
@@ -146,9 +162,11 @@ async def update_user(
     )
     if not user_requested:
         raise HTTPException(status_code=404, detail="User not found")
-    if user_requested.scopes == ",".join(user_update.scopes):
-        return UserOut(**user_requested.__dict__)
-    user_requested.scopes = ",".join(user_update.scopes)
+    user_update = user_update.model_dump(exclude_none=True)
+    for key, value in user_update.items():
+        if key == "scopes":
+            value = ",".join(value)
+        setattr(user_requested, key, value)
     db.add(user_requested)
     db.commit()
     db.refresh(user_requested)
@@ -160,11 +178,15 @@ async def delete_user(
     username: str,
     user: UserDB = Security(get_current_user, scopes=["admin"]),
     db: Session = Depends(get_db),
-) -> UserOut:
+):
     """Delete user."""
     if username == "admin":
         raise HTTPException(403, "You can not delete admin.")
-    user = db.query(UserDB).filter(UserDB.username == username).first()
+    user = (
+        db.query(UserDB)
+        .filter(UserDB.username == username, UserDB.active == True)
+        .first()
+    )
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     user.active = False

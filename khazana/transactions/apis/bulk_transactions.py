@@ -63,7 +63,7 @@ def create_bulk_transactions(
 ):
     """Create bulk transactions."""
     transaction_user = (
-        db.query(UserDB).filter(UserDB.username == username).first()
+        db.query(UserDB).filter(UserDB.username == username, UserDB.active == True).first()
     )
     if not transaction_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -126,7 +126,7 @@ def export_transactions(
 ):
     """Export user transactions."""
     requested_user = (
-        db.query(UserDB).filter(UserDB.username == username).first()
+        db.query(UserDB).filter(UserDB.username == username, UserDB.active == True).first()
     )
     if not requested_user:
         raise HTTPException(status_code=404, detail="User not found")

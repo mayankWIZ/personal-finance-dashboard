@@ -34,7 +34,7 @@ def get_dashboard_data_by_username(
     For total savings, monthly expenses, and investment growth by user.
     """
     requested_user = (
-        db.query(UserDB).filter(UserDB.username == username).first()
+        db.query(UserDB).filter(UserDB.username == username, UserDB.active == True).first()
     )
     if not requested_user:
         raise HTTPException(status_code=404, detail="User not found")
@@ -119,7 +119,7 @@ def get_dashboard_data(
     For total savings, monthly expenses, and investment growth by user.
     """
     requested_user = (
-        db.query(UserDB).filter(UserDB.username == user.username).first()
+        db.query(UserDB).filter(UserDB.username == user.username, UserDB.active == True).first()
     )
     if not requested_user:
         raise HTTPException(status_code=404, detail="User not found")
