@@ -1,16 +1,12 @@
 """Configuration for pytest."""
-
-import pytest
 import os
-import sys
+import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from khazana.core.database import DBBaseModel
 from khazana.core.apis.main import app
-from khazana.core.models import UserDB
-from khazana.core.utils import get_password_hash
 
 DATABASE_URL = "sqlite:///./test.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
@@ -19,15 +15,23 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 DBBaseModel.metadata.create_all(bind=engine)
 
 
-@pytest.fixture(scope="module")
-def client():
+@pytest.fixture(scope="session")
+def setup():
+    """Initialize setup."""
+    os.environ["JWT_SECRET"] = "secret"
+    os.environ["JWT_ALGORITHM"] = "HS256"
+    yield
+
+
+@pytest.fixture(scope="module", autouse=True)
+def client(setup):
     """Get FastAPI test client."""
     with TestClient(app) as client:
         yield client
 
 
 @pytest.fixture(scope="module")
-def first_time_auth_client():
+def first_time_auth_client(setup):
     """Get FastAPI test client for first time login."""
     with TestClient(app) as client:
         response = client.post(
@@ -39,7 +43,7 @@ def first_time_auth_client():
 
 
 @pytest.fixture(scope="module")
-def auth_client():
+def auth_client(setup):
     """Get FastAPI test client."""
     with TestClient(app) as client:
         response = client.post(
@@ -51,26 +55,10 @@ def auth_client():
 
 
 @pytest.fixture(scope="module")
-def db_session():
+def db_session(setup):
     """Database session."""
     session = TestingSessionLocal()
     try:
         yield session
     finally:
         session.close()
-
-
-# def pytest_sessionstart(session):
-#     """
-#     Initialize session.
-
-#     Args:
-#         session: The session object.
-
-#     Returns:
-#         None.
-#     """
-#     CODE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-#     # allow import of `khazana`
-#     sys.path.append(CODE_DIR)

@@ -47,7 +47,7 @@ Personal Finance Dashboard
 
 - **Running Tests and Generating coverage:**
     ```bash
-    pytest --cov=khazana tests/ && coverage html && coverage report
+    pytest --cov-config=.coveragerc --cov=khazana tests/ && coverage html && coverage report
     ```
 
 - **Linting and Formatting:**

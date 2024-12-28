@@ -18,5 +18,5 @@ def test_verify_password():
 def test_create_access_token():
     """Test access token creation."""
     data = {"username": "testuser"}
-    # token = create_access_token(data, expires_delta=timedelta(minutes=5))
-    # assert token is not None
+    token = create_access_token(data, expires_delta=timedelta(minutes=5))
+    assert token is not None
