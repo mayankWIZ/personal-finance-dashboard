@@ -76,7 +76,8 @@ def create_bulk_transactions(
     print(f"Importing transactions from {filename}...")
     transactions = pd.read_csv(transaction_file.file)
     transactions["userId"] = transaction_user.id
-    transactions = transactions.drop(axis=1, columns=["id"])
+    if "id" in transactions.columns:
+        transactions = transactions.drop(axis=1, columns=["id"])
     transactions["createdBy"] = user.id
 
     transactions["category"] = transactions["category"].fillna("Uncategorized")
