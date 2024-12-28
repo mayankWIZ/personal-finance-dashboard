@@ -16,6 +16,7 @@ from ..utils import (
     EXCHANGE_RATE_EXPIRE_MINUTES,
     fetch_exchange_rate_symbols,
     fetch_exchange_rates,
+    change_base_currency_exchange_rates,
 )
 
 router = APIRouter(tags=["Exchange Rates"])
@@ -60,14 +61,23 @@ def list_exchange_rates(
                 db.add(ExchangeRateSymbolDB(symbol=symbol, fullName=full_name))
         db.commit()
         exchange_rates = fetch_exchange_rates()
-        rate = ExchangeRatesDB(
-            base=exchange_rates["base"],
-            last_updated=datetime.now(timezone.utc),
-            rates=exchange_rates["rates"],
-        )
+        if not rate:
+            rate = ExchangeRatesDB(
+                base="USD",
+                last_updated=datetime.now(timezone.utc),
+                rates=exchange_rates["rates"],
+            )
+        else:
+            rate.base = "USD"
+            rate.last_updated = datetime.now(timezone.utc)
+            rate.rates = exchange_rates["rates"]
         db.add(rate)
         db.commit()
         db.refresh(rate)
+
+    rate.rates = change_base_currency_exchange_rates(
+        rate.rates, rate.base, "USD"
+    )
     return ExchangeRatesOut(**rate.__dict__)
 
 
