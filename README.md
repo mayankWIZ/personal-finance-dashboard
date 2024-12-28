@@ -45,9 +45,9 @@ Personal Finance Dashboard
 
 ## Additional Information
 
-- **Running Tests:**
+- **Running Tests and Generating coverage:**
     ```bash
-    pytest tests # or the command you use for running tests
+    pytest --cov=khazana tests/ && coverage html && coverage report
     ```
 
 - **Linting and Formatting:**
